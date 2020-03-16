@@ -26,17 +26,15 @@ class ViewController: UIViewController {
        
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         readSavedFlashcards()
         
         //create first card if needed
         if flashcards.count == 0 {
-            updateFlashcard(question: "What is the most expensive violin?", answer: "Stradivarius")
+            updateFlashcard(question: "There are no cards", answer: "Hit the + to add a card", isExisting: false)
         } else {
             updateLabels()
             updateNextPrevButton()
         }
-        
         
         //card style
         card.layer.cornerRadius = 20.0
@@ -55,6 +53,13 @@ class ViewController: UIViewController {
         
         let creationController = navigationController.topViewController as! CreationViewController
             creationController.flashcardController = self
+        
+        if segue.identifier == "EditSegue" {
+            creationController.initialQuestion = frontLabel.text
+            creationController.initialAnswer = backLabel.text
+            
+        }
+        
     }
     
     //Flips card
@@ -67,19 +72,27 @@ class ViewController: UIViewController {
     }
     
     //changes labels on card
-    func updateFlashcard(question: String, answer: String)  {
+    func updateFlashcard(question: String, answer: String, isExisting: Bool)  {
         //utilizing struct
         let flashcard = Flashcard(question: question, answer: answer)
         frontLabel.text = flashcard.question
         backLabel.text = flashcard.answer
         
-        //adding to flashcard array
-        flashcards.append(flashcard)
-        print("added new flashcard")
-        print("We now have \(flashcards.count) cards")
+        if isExisting {
+            flashcards[currentIndex] = flashcard
+        } else {
+            //adding to flashcard array
+            flashcards.append(flashcard)
+            print("added new flashcard")
+            print("We now have \(flashcards.count) cards")
+            
+            //update currentIndex
+            currentIndex = flashcards.count - 1
+            //Log
+            print("Current Index: \(currentIndex)")
+        }
         
-        currentIndex = flashcards.count - 1
-        print("Current Index: \(currentIndex)")
+        //Update
         updateNextPrevButton()
         updateLabels()
         
